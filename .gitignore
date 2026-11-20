@@ -1,0 +1,67 @@
+# ==============================================================================
+# ObserVault Git Ignore Policy
+# ==============================================================================
+
+# Environment files and credentials (NEVER COMMIT REAL SECRETS)
+.env
+.env.*
+!.env.example
+*.env
+collector_config.json
+**/collector_config.json
+*.pem
+*.key
+*.cert
+
+# Python virtual environments & bytecode
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases & buffer stores (SQLite)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+collector_buffer.db
+observault_saas.db
+backend/observault_saas.db
+collector/data/
+collector_buffer/
+
+# Process tracking & logs
+*.pid
+*.log
+collector.pid
+collector.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node / Frontend dependencies & build outputs
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+dist-ssr/
+*.local
+
+# IDEs, OS metadata & tool caches
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.sf/

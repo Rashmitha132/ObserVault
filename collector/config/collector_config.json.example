@@ -1,0 +1,10 @@
+{
+  "collector_id": "col-placeholder",
+  "collector_key": "ov_col_placeholder_secret_key",
+  "collector_name": "Example-Node",
+  "server_id": "00000000-0000-0000-0000-000000000000",
+  "tenant_id": "00000000-0000-0000-0000-000000000000",
+  "collection_interval": 5,
+  "heartbeat_interval": 15,
+  "backend_url": "http://127.0.0.1:8000"
+}

@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Central SaaS PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: observault-postgres
+    environment:
+      POSTGRES_USER: observault_user
+      POSTGRES_PASSWORD: observault_secure_password_2026
+      POSTGRES_DB: observault_saas
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U observault_user -d observault_saas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Tier 2: Central SaaS Backend (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: observault-backend
+    environment:
+      DATABASE_URL: postgresql://observault_user:observault_secure_password_2026@postgres:5432/observault_saas
+      SECRET_KEY: observault-production-jwt-secret-key-2026-hackathon
+      CORS_ORIGINS: '["*"]'
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # React Frontend (Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: observault-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  # Tier 1: Local On-Premises Collector (Simulated Customer Perimeter)
+  collector:
+    build:
+      context: ./collector
+      dockerfile: Dockerfile
+    container_name: observault-local-collector
+    environment:
+      OBSERVAULT_BACKEND_URL: http://backend:8000
+      OBSERVAULT_COLLECTOR_KEY: ov_col_acme_production_secret_key_2026
+      COLLECTOR_ID: col-acme-edge-01
+      HOSTNAME: acme-onprem-node-01
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
