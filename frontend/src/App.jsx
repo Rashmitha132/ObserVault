@@ -76,7 +76,7 @@ function ProtectedLayout() {
             mobileOpen={mobileSidebarOpen} 
             onCloseMobile={() => setMobileSidebarOpen(false)} 
           />
-          <main className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full transition-all duration-200">
+          <main className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
             <Outlet key={refreshKey} context={{ triggerGlobalRefresh, searchQuery, timeRange }} />
           </main>
         </div>

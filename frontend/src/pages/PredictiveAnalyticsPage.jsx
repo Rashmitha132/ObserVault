@@ -1,5 +1,6 @@
 // frontend/src/pages/PredictiveAnalyticsPage.jsx
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   TrendingUp, 
   AlertTriangle, 
@@ -775,8 +776,11 @@ export default function PredictiveAnalyticsPage() {
       </div>
 
       {/* Configure Custom SLO Modal */}
-      {showSloModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+      {showSloModal && createPortal(
+        <div 
+          onClick={(e) => { if (e.target === e.currentTarget) setShowSloModal(false); }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn"
+        >
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Configure Service Level Objective (SLO)</h3>
@@ -860,7 +864,8 @@ export default function PredictiveAnalyticsPage() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

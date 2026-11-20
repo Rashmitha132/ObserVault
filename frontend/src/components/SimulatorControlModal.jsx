@@ -1,5 +1,6 @@
 // frontend/src/components/SimulatorControlModal.jsx
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { api } from '../services/api';
 import { 
   Play, 
@@ -101,8 +102,11 @@ export default function SimulatorControlModal({ isOpen, onClose, onScenarioTrigg
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
+  return createPortal(
+    <div 
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn"
+    >
       <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
         <div className="flex items-start justify-between border-b border-slate-100 dark:border-white/5 pb-4">
           <div className="flex items-center gap-3">
@@ -200,6 +204,7 @@ export default function SimulatorControlModal({ isOpen, onClose, onScenarioTrigg
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

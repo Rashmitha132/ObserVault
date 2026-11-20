@@ -1,5 +1,6 @@
 // frontend/src/pages/CollectorManagementPage.jsx
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { api } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import { 
@@ -443,8 +444,11 @@ export default function CollectorManagementPage() {
       </div>
 
       {/* ONBOARDING WIZARD MODAL */}
-      {wizardOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+      {wizardOpen && createPortal(
+        <div 
+          onClick={(e) => { if (e.target === e.currentTarget) resetWizard(); }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn"
+        >
           <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
@@ -747,12 +751,16 @@ export default function CollectorManagementPage() {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* DEVICE DETAILS & AUDIT MODAL */}
-      {selectedCollector && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+      {selectedCollector && createPortal(
+        <div 
+          onClick={(e) => { if (e.target === e.currentTarget) setSelectedCollector(null); }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn"
+        >
           <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
@@ -977,7 +985,8 @@ export default function CollectorManagementPage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
