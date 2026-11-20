@@ -66,17 +66,17 @@ function ProtectedLayout() {
       timeRange,
       setTimeRange
     }}>
-      <div className="min-h-screen app-mesh-bg text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-600 dark:selection:text-cyan-300">
+      <div className="h-screen app-mesh-bg text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-600 dark:selection:text-cyan-300 overflow-hidden">
         <Navbar 
           onRefresh={triggerGlobalRefresh} 
           onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)} 
         />
-        <div className="flex-1 flex overflow-hidden relative">
+        <div className="flex-1 flex min-h-0 overflow-hidden relative">
           <Sidebar 
             mobileOpen={mobileSidebarOpen} 
             onCloseMobile={() => setMobileSidebarOpen(false)} 
           />
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full transition-all duration-200">
+          <main className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full transition-all duration-200">
             <Outlet key={refreshKey} context={{ triggerGlobalRefresh, searchQuery, timeRange }} />
           </main>
         </div>

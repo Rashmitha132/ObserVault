@@ -74,7 +74,7 @@ export default function Navbar({ onRefresh, onToggleMobileSidebar }) {
 
   return (
     <>
-      <header className="h-16 border-b border-slate-200/80 dark:border-white/5 glass-panel sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between gap-3">
+      <header className="h-16 shrink-0 border-b border-slate-200/80 dark:border-white/5 glass-panel sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between gap-3">
         {/* Left: Mobile Menu + Brand Logo */}
         <div className="flex items-center gap-3">
           <button
