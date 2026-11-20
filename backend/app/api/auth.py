@@ -48,10 +48,12 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     )
 
 @router.get("/me", response_model=UserOut)
-def get_me(current_user: User = Depends(get_current_user)):
+def get_me(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    tenant = db.query(Tenant).filter(Tenant.id == current_user.tenant_id).first()
     return UserOut(
         id=current_user.id,
         tenant_id=current_user.tenant_id,
+        tenant_name=tenant.name if tenant else None,
         email=current_user.email,
         full_name=current_user.full_name,
         role=current_user.role,

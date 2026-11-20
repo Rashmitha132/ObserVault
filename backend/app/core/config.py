@@ -36,6 +36,7 @@ def _load_dotenv_if_present():
 _load_dotenv_if_present()
 
 class Settings(BaseModel):
+    BASE_DIR: Path = BASE_DIR
     PROJECT_NAME: str = "ObserVault SaaS Backend"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"

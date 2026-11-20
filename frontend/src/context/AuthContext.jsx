@@ -17,7 +17,16 @@ export function AuthProvider({ children }) {
       if (token) {
         try {
           const userData = await api.getCurrentUser();
-          setUser(userData);
+          const userProfile = {
+            id: userData.id || userData.email,
+            email: userData.email,
+            fullName: userData.full_name || userData.fullName,
+            tenantId: userData.tenant_id || userData.tenantId,
+            tenantName: userData.tenant_name || userData.tenantName,
+            role: userData.role,
+          };
+          localStorage.setItem('observault_user', JSON.stringify(userProfile));
+          setUser(userProfile);
         } catch (err) {
           console.warn('Session expired or invalid, logging out');
           logout();

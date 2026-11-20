@@ -222,13 +222,16 @@ def register_device(
     db.add(audit)
     db.commit()
 
-    # Formulate copyable commands
+    # Formulate copyable commands (OV-BUG-005 & OV-BUG-003: Auto cd to repo dir and start daemon)
+    repo_dir = str(settings.BASE_DIR.parent)
     ps_cmd = (
+        f"cd \"{repo_dir}\"; "
         f"$env:OBSERVAULT_ENROLL_TOKEN='{raw_enrollment_token}'; "
         f"$env:OBSERVAULT_BACKEND_URL='http://127.0.0.1:8000'; "
         f"python -m collector.enroll; python -m collector.runtime start"
     )
     cli_cmd = (
+        f"cd \"{repo_dir}\" && "
         f"python -m collector.enroll --token {raw_enrollment_token} --backend http://127.0.0.1:8000 && python -m collector.runtime start"
     )
 

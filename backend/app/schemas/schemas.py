@@ -20,6 +20,7 @@ class TokenResponse(BaseModel):
 class UserOut(BaseModel):
     id: str
     tenant_id: str
+    tenant_name: Optional[str] = None
     email: str
     full_name: str
     role: str

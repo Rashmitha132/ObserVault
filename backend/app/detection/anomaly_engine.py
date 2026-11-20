@@ -104,21 +104,23 @@ def run_anomaly_detection(
     else:
         checks.append((False, "packet_loss", None, None, None, "packet_loss_percent", record.packet_loss_percent, tenant.packet_loss_threshold))
 
-    # 6. Failed Logins Check
-    if record.failed_login_count >= tenant.failed_login_threshold:
-        severity = "high" if record.failed_login_count >= 10 else "medium"
+    # 6. Failed Logins Check (OV-BUG-002: Null-safe evaluation)
+    fl_count = record.failed_login_count if record.failed_login_count is not None else 0
+    fl_thresh = tenant.failed_login_threshold if getattr(tenant, "failed_login_threshold", None) is not None else 3
+    if fl_count >= fl_thresh:
+        severity = "high" if fl_count >= 10 else "medium"
         checks.append((
             True,
             "auth_spike",
             severity,
             f"Repeated Authentication Failures on {server.display_name}",
-            f"Detected {record.failed_login_count} failed login attempts within the evaluation interval (threshold: {tenant.failed_login_threshold}).",
+            f"Detected {fl_count} failed login attempts within the evaluation interval (threshold: {fl_thresh}).",
             "failed_login_count",
-            float(record.failed_login_count),
-            float(tenant.failed_login_threshold)
+            float(fl_count),
+            float(fl_thresh)
         ))
     else:
-        checks.append((False, "auth_spike", None, None, None, "failed_login_count", float(record.failed_login_count), float(tenant.failed_login_threshold)))
+        checks.append((False, "auth_spike", None, None, None, "failed_login_count", float(fl_count), float(fl_thresh)))
 
     # 7. Service Availability Check
     if record.service_status in ["down", "degraded"]:

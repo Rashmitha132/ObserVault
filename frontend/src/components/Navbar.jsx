@@ -55,12 +55,14 @@ export default function Navbar({ onRefresh, onToggleMobileSidebar }) {
   const handleSwitchTenant = async () => {
     setIsSwitching(true);
     try {
-      if (user?.tenantName?.toLowerCase().includes('acme')) {
+      const isAcme = user?.email?.toLowerCase().includes('acme') || user?.tenantName?.toLowerCase().includes('acme');
+      if (isAcme) {
         await login('admin@biohealth.com', 'Password123!');
       } else {
         await login('admin@acme.com', 'Password123!');
       }
       if (onRefresh) onRefresh();
+      window.location.reload();
     } catch (err) {
       console.error('Failed to switch demo tenant', err);
     } finally {

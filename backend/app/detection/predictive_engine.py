@@ -225,9 +225,14 @@ class PredictiveEngine:
 
         if slope_per_day > 0 and current_y < threshold_value:
             needed_increase = threshold_value - current_y
-            days_to_threshold = round(needed_increase / slope_per_day, 1)
-            breach_dt = utc_now() + timedelta(days=days_to_threshold)
-            projected_breach_date = breach_dt.isoformat()
+            raw_days = needed_increase / slope_per_day
+            if raw_days > 3650.0:  # Runway greater than 10 years is stable
+                days_to_threshold = None
+                projected_breach_date = None
+            else:
+                days_to_threshold = round(raw_days, 1)
+                breach_dt = utc_now() + timedelta(days=days_to_threshold)
+                projected_breach_date = breach_dt.isoformat()
         elif current_y >= threshold_value:
             days_to_threshold = 0.0
             projected_breach_date = utc_now().isoformat()
