@@ -99,6 +99,17 @@ app.include_router(integrations.router, prefix="/api", tags=["Real Infrastructur
 app.include_router(ai.router, prefix=f"{settings.API_V1_STR}/ai", tags=["AI Intelligence Layer"])
 app.include_router(ai.router, prefix="/api/ai", tags=["AI Intelligence Layer"])
 
+@app.get("/")
+def root():
+    return {
+        "service": "ObserVault SaaS Backend",
+        "status": "online",
+        "version": settings.VERSION,
+        "docs_url": "/docs",
+        "health_url": "/health",
+        "privacy_enforcement": "strict_allowlist_active"
+    }
+
 @app.get("/health")
 def health_check():
     return {
