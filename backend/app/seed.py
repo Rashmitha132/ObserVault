@@ -494,8 +494,74 @@ def seed_database():
     print(" 2) BioHealth Global  (email: admin@biohealth.com / Password123!)")
 
 def seed_traces_if_empty(db=None):
+    import sys
+    from pathlib import Path
+    
+    # Ensure repo root is on sys.path if collector is located there
+    backend_dir = Path(__file__).resolve().parent.parent
+    repo_root = backend_dir.parent
+    for p in [str(backend_dir), str(repo_root)]:
+        if p not in sys.path:
+            sys.path.insert(0, p)
+
     from app.models.models import TraceSpan, ServiceNode, ServiceDependency, Tenant, Collector
-    from collector.instrumentation.fastapi_instrumentor import TraceGenerator
+
+    def _fallback_generate_spans(simulate_error=False):
+        trace_id = f"trace-{uuid.uuid4().hex}"
+        now_ts = datetime.now(timezone.utc)
+        s1_id = f"span-{uuid.uuid4().hex[:12]}"
+        s2_id = f"span-{uuid.uuid4().hex[:12]}"
+        s3_id = f"span-{uuid.uuid4().hex[:12]}"
+        return [
+            {
+                "trace_id": trace_id,
+                "span_id": s1_id,
+                "parent_span_id": None,
+                "service_name": "api-gateway",
+                "operation_name": "GET /api/v1/orders/{order_id}",
+                "span_kind": "SERVER",
+                "start_time": now_ts.isoformat(),
+                "end_time": (now_ts + timedelta(milliseconds=185.0 if simulate_error else 45.0)).isoformat(),
+                "duration_ms": 185.0 if simulate_error else 45.0,
+                "status_code": "ERROR" if simulate_error else "OK",
+                "status_message": "Downstream dependency failure" if simulate_error else None,
+                "attributes": {"http.method": "GET", "http.status_code": 500 if simulate_error else 200}
+            },
+            {
+                "trace_id": trace_id,
+                "span_id": s2_id,
+                "parent_span_id": s1_id,
+                "service_name": "orders-service",
+                "operation_name": "FetchOrderDetails",
+                "span_kind": "INTERNAL",
+                "start_time": (now_ts + timedelta(milliseconds=5.0)).isoformat(),
+                "end_time": (now_ts + timedelta(milliseconds=170.0 if simulate_error else 38.0)).isoformat(),
+                "duration_ms": 165.0 if simulate_error else 33.0,
+                "status_code": "ERROR" if simulate_error else "OK",
+                "status_message": "Database query timeout" if simulate_error else None,
+                "attributes": {"order.id": 1042}
+            },
+            {
+                "trace_id": trace_id,
+                "span_id": s3_id,
+                "parent_span_id": s2_id,
+                "service_name": "postgres-primary",
+                "operation_name": "SELECT * FROM orders WHERE id = $1",
+                "span_kind": "CLIENT",
+                "start_time": (now_ts + timedelta(milliseconds=8.0)).isoformat(),
+                "end_time": (now_ts + timedelta(milliseconds=160.0 if simulate_error else 18.0)).isoformat(),
+                "duration_ms": 152.0 if simulate_error else 10.0,
+                "status_code": "ERROR" if simulate_error else "OK",
+                "status_message": "Connection pool timeout" if simulate_error else None,
+                "attributes": {"db.system": "postgresql"}
+            }
+        ]
+
+    try:
+        from collector.instrumentation.fastapi_instrumentor import TraceGenerator
+        gen_trace = TraceGenerator.generate_distributed_trace
+    except Exception:
+        gen_trace = _fallback_generate_spans
 
     close_db = False
     if db is None:
@@ -566,7 +632,7 @@ def seed_traces_if_empty(db=None):
         # 3. Generate distributed traces (6 realistic traces: 5 nominal, 1 error scenario)
         for i in range(5):
             sim_error = (i == 3)  # One trace with downstream DB timeout
-            spans = TraceGenerator.generate_distributed_trace(simulate_error=sim_error)
+            spans = gen_trace(simulate_error=sim_error)
             for s in spans:
                 span_rec = TraceSpan(
                     id=str(uuid.uuid4()),
