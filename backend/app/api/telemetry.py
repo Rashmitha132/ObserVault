@@ -78,11 +78,11 @@ def ingest_telemetry(
             duplicate_count += 1
             continue
 
-        # Look up or create server
+        # Look up or create server (matching by collector_id or case-insensitive hostname)
         server = db.query(Server).filter(
             Server.tenant_id == tenant_id,
-            Server.hostname == item.hostname
-        ).first()
+            (Server.collector_id == collector.id) | (Server.hostname.ilike(item.hostname))
+        ).order_by(Server.last_cpu.desc()).first()
 
         if not server:
             server = Server(

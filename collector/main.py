@@ -83,8 +83,17 @@ def main():
     parser.add_argument("--test-privacy", action="store_true", help="Run explicit local privacy sanitisation demonstration")
     parser.add_argument("--once", action="store_true", help="Run one collection cycle and exit")
     parser.add_argument("--interval", type=int, default=settings.COLLECTION_INTERVAL_SECONDS, help="Collection interval in seconds")
+    parser.add_argument("--log-file", type=str, default=None, help="Redirect stdout/stderr to specified log file")
 
     args = parser.parse_args()
+
+    if args.log_file:
+        try:
+            log_f = open(args.log_file, "a", encoding="utf-8", buffering=1)
+            sys.stdout = log_f
+            sys.stderr = log_f
+        except Exception:
+            pass
 
     if args.test_privacy:
         run_privacy_test()

@@ -106,9 +106,8 @@ def start_daemon(foreground: bool = False):
     print(f"[*] Spawning background collector process...")
     python_exe = sys.executable
 
-    log_handle = open(LOG_FILE, "a", encoding="utf-8")
-    log_handle.write(f"\n--- Collector started at {time.strftime('%Y-%m-%d %H:%M:%S')} ---\n")
-    log_handle.flush()
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(f"\n--- Collector started at {time.strftime('%Y-%m-%d %H:%M:%S')} ---\n")
 
     creationflags = 0
     if sys.platform.startswith("win"):
@@ -117,10 +116,11 @@ def start_daemon(foreground: bool = False):
         creationflags = 0x08000000 | subprocess.CREATE_NEW_PROCESS_GROUP
 
     proc = subprocess.Popen(
-        [python_exe, "-u", "-m", "collector.main", "--mode", "live"],
+        [python_exe, "-u", "-m", "collector.main", "--mode", "live", "--log-file", str(LOG_FILE)],
         cwd=str(project_dir),
-        stdout=log_handle,
-        stderr=subprocess.STDOUT,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
         creationflags=creationflags
     )
 

@@ -522,11 +522,12 @@ def get_device_details(
     server = db.query(Server).filter(
         Server.collector_id == collector.id,
         Server.tenant_id == current_user.tenant_id
-    ).first()
+    ).order_by(Server.last_cpu.desc(), Server.last_seen.desc()).first()
 
     latest_telemetry = db.query(TelemetryRecord).filter(
         TelemetryRecord.tenant_id == current_user.tenant_id,
-        TelemetryRecord.server_id == (server.id if server else "")
+        (TelemetryRecord.collector_id == collector.id) | 
+        (TelemetryRecord.server_id == (server.id if server else ""))
     ).order_by(TelemetryRecord.timestamp.desc()).first()
 
     computed_status = compute_collector_status(collector, heartbeat_cutoff)
