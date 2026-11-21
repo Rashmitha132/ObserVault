@@ -158,6 +158,7 @@ def get_device_management_stats(
 @router.post("/register", response_model=DeviceRegisterResponse)
 def register_device(
     payload: DeviceRegisterRequest,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -222,17 +223,27 @@ def register_device(
     db.add(audit)
     db.commit()
 
-    # Formulate copyable commands (OV-BUG-005 & OV-BUG-003: Auto cd to repo dir and start daemon)
+    # Formulate copyable commands with dynamic backend URL
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "127.0.0.1:8000"
+    proto = request.headers.get("x-forwarded-proto") or request.url.scheme or "http"
+    backend_url = f"{proto}://{host}"
+    if "0.0.0.0" in backend_url:
+        backend_url = backend_url.replace("0.0.0.0", "127.0.0.1")
+
     repo_dir = str(settings.BASE_DIR.parent)
+    is_cloud_path = "/opt/render" in repo_dir or "/app" in repo_dir or repo_dir.startswith("/root") or repo_dir.startswith("/var")
+    cd_prefix_ps = "" if is_cloud_path else f"cd \"{repo_dir}\"; "
+    cd_prefix_cli = "" if is_cloud_path else f"cd \"{repo_dir}\" && "
+
     ps_cmd = (
-        f"cd \"{repo_dir}\"; "
+        f"{cd_prefix_ps}"
         f"$env:OBSERVAULT_ENROLL_TOKEN='{raw_enrollment_token}'; "
-        f"$env:OBSERVAULT_BACKEND_URL='http://127.0.0.1:8000'; "
+        f"$env:OBSERVAULT_BACKEND_URL='{backend_url}'; "
         f"python -m collector.enroll; python -m collector.runtime start"
     )
     cli_cmd = (
-        f"cd \"{repo_dir}\" && "
-        f"python -m collector.enroll --token {raw_enrollment_token} --backend http://127.0.0.1:8000 && python -m collector.runtime start"
+        f"{cd_prefix_cli}"
+        f"python -m collector.enroll --token {raw_enrollment_token} --backend {backend_url} && python -m collector.runtime start"
     )
 
     return DeviceRegisterResponse(
