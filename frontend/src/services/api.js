@@ -1,5 +1,13 @@
 // frontend/src/services/api.js
-const API_BASE = '/api/v1';
+const RAW_BACKEND_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_BASE = `${RAW_BACKEND_URL}/api/v1`;
+
+function resolveUrl(path) {
+  if (RAW_BACKEND_URL && path.startsWith('/api')) {
+    return `${RAW_BACKEND_URL}${path}`;
+  }
+  return path;
+}
 
 function getAuthHeaders() {
   const token = localStorage.getItem('observault_token');
@@ -20,7 +28,7 @@ async function request(endpoint, options = {}) {
   };
 
   try {
-    const res = await fetch(url, { ...options, headers });
+    const res = await fetch(resolveUrl(url), { ...options, headers });
     if (res.status === 401) {
       // Clear token and redirect if unauthorized
       localStorage.removeItem('observault_token');
@@ -172,7 +180,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getTraceDetail: async (traceId) => {
@@ -180,7 +188,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getServices: async () => {
@@ -188,7 +196,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getServiceDependencies: async () => {
@@ -196,7 +204,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
 
@@ -227,7 +235,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getMLAnomalyDetail: async (anomalyId) => {
@@ -235,7 +243,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getMLModels: async () => {
@@ -243,7 +251,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getMLEvaluation: async () => {
@@ -251,7 +259,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   retrainMLModel: async () => {
@@ -259,7 +267,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { method: 'POST', headers });
+    const res = await fetch(resolveUrl(url), { method: 'POST', headers });
     return res.json();
   },
 
@@ -273,7 +281,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getIncidentRCA: async (incidentId) => {
@@ -281,7 +289,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getBlastRadius: async (componentName) => {
@@ -289,7 +297,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
 
@@ -299,7 +307,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getCapacityWarnings: async () => {
@@ -307,7 +315,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getSLOMetrics: async () => {
@@ -315,7 +323,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   createSLO: async (sloData) => {
@@ -323,7 +331,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, {
+    const res = await fetch(resolveUrl(url), {
       method: 'POST',
       headers,
       body: JSON.stringify(sloData),
@@ -335,7 +343,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getRealHostTelemetry: async () => {
@@ -343,7 +351,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   getDockerStatus: async () => {
@@ -351,7 +359,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { headers });
+    const res = await fetch(resolveUrl(url), { headers });
     return res.json();
   },
   testIntegration: async (integrationType) => {
@@ -359,7 +367,7 @@ export const api = {
     const headers = { 'Content-Type': 'application/json' };
     const token = localStorage.getItem('observault_token');
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const res = await fetch(url, { method: 'POST', headers });
+    const res = await fetch(resolveUrl(url), { method: 'POST', headers });
     return res.json();
   },
 
